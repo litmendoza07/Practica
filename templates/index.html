@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi DATA LAB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #111827;
+            color: #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 min-h-screen text-slate-100">
+    <main class="max-w-6xl mx-auto p-8">
+        <h1 class="text-4xl font-bold mb-6">Simulador de estructuras de datos</h1>
+
+        <div class="bg-slate-800 rounded-lg p-5 mb-6">
+            <label class="block text-sm font-medium mb-2">Estructura</label>
+            <select id="tipo" class="w-full rounded-md bg-slate-700 p-3 text-white">
+                <option value="pila">Pila</option>
+                <option value="cola">Cola</option>
+                <option value="lista">Lista</option>
+                <option value="arbol">Árbol</option>
+                <option value="grafo">Grafo</option>
+            </select>
+        </div>
+
+        <div class="bg-slate-800 rounded-lg p-5 mb-6">
+            <label class="block text-sm font-medium mb-2">Operación</label>
+            <select id="accion" class="w-full rounded-md bg-slate-700 p-3 text-white">
+                <option value="agregar">Agregar</option>
+                <option value="extraer">Extraer</option>
+                <option value="reiniciar">Reiniciar</option>
+            </select>
+        </div>
+
+        <div class="bg-slate-800 rounded-lg p-5 mb-6">
+            <label class="block text-sm font-medium mb-2">Valor</label>
+            <input id="valor" type="text" class="w-full rounded-md bg-slate-700 p-3 text-white" value="">
+        </div>
+
+        <div class="bg-slate-800 rounded-lg p-5 mb-6">
+            <label class="block text-sm font-medium mb-2">Padre / Otro</label>
+            <input id="otro" type="text" class="w-full rounded-md bg-slate-700 p-3 text-white" value="">
+        </div>
+
+        <button id="ejecutar" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg mb-6">
+            Ejecutar
+        </button>
+
+        <div class="bg-slate-800 rounded-lg p-5">
+            <h2 class="text-2xl font-bold mb-4">Estado actual</h2>
+            <pre id="salida" class="whitespace-pre-wrap text-sm text-green-300">Cargando...</pre>
+        </div>
+    </main>
+
+    <script>
+        const tipo = document.querySelector('#tipo');
+        const accion = document.querySelector('#accion');
+        const valor = document.querySelector('#valor');
+        const otro = document.querySelector('#otro');
+        const salida = document.querySelector('#salida');
+        const boton = document.querySelector('#ejecutar');
+
+        async function cargarEstado() {
+            const respuesta = await fetch('/api/estado');
+            const datos = await respuesta.json();
+            salida.textContent = JSON.stringify(datos, null, 2);
+        }
+
+        boton.addEventListener('click', async () => {
+            const datos = {
+                tipo: tipo.value,
+                accion: accion.value,
+                valor: valor.value || null,
+                otro: otro.value || null,
+            };
+
+            const respuesta = await fetch('/api/operacion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos),
+            });
+
+            const texto = await respuesta.json();
+            salida.textContent = JSON.stringify(texto, null, 2);
+        });
+
+        cargarEstado();
+    </script>
+</body>
+</html>
